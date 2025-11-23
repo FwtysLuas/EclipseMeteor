@@ -1,0 +1,46 @@
+local HttpService = game:GetService("HttpService")
+local Analytics = game:GetService("RbxAnalyticsService")
+local Player = game.Players.LocalPlayer
+
+-- USER'S KEY PROVIDED IN EXECUTOR
+local KEY = _G.Key
+
+if not KEY or KEY == "" then
+    Player:Kick("❌ No key found.\nSet your key first:\n_G.Key = \"YOURKEY\"")
+    return
+end
+
+-- Get HWID
+local HWID = Analytics:GetClientId()
+
+-- Your HWID + KEY API
+local API = "https://dbe45b05-5e5e-4ef0-b443-5a568e4fa406-00-3nh8okiz0eujv.sisko.replit.dev/check"
+
+local url = API .. "?key=" .. KEY .. "&hwid=" .. HWID
+
+-- Send request
+local ok, response = pcall(function()
+    return game:HttpGet(url)
+end)
+
+-- Freeze if server offline
+if not ok then
+    local hum = Player.Character:WaitForChild("Humanoid")
+    hum.WalkSpeed = 0
+    hum.JumpPower = 0
+    while true do task.wait() end
+end
+
+local data = HttpService:JSONDecode(response)
+
+-- Freeze if failed
+if not data.success then
+    local hum = Player.Character:WaitForChild("Humanoid")
+    hum.WalkSpeed = 0
+    hum.JumpPower = 0
+    while true do task.wait() end
+    return
+end
+
+-- LOAD YOUR REAL SCRIPT
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AsianTwchSecond/Loveu/refs/heads/main/stay.txt"))()
